@@ -6,7 +6,7 @@
 ![Platforms](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 
 A command-line downloader for **TikTok, YouTube, Dailymotion, SoundCloud, Instagram,
-X, and Threads** — security-hardened, with real progress bars, automatic
+X, and Threads** — security-hardened, automatic
 quality-aware deduplication, and playback fixes for native macOS players. Also
 converts local video files to MP3 with `--convert`, no network access required.
 
