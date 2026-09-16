@@ -1,6 +1,6 @@
 # Grabinator
 
-[!(https://github.com/<you>/grabinator/actions/workflows/test.yml/badge.svg)](https://github.com/<you>/grabinator/actions/workflows/test.yml)
+[! (https://github.com/<you>/grabinator/actions/workflows/test.yml/badge.svg)](https://github.com/<you>/grabinator/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Platforms](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
