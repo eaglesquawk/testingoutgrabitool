@@ -224,7 +224,7 @@ OUTPUT_DIR = Path.home() / "Downloads" / "Grabinator"
 Edit that constant, or pass `--output-dir` on the command line to override it per run.
 Whatever you choose, each platform still gets its own subfolder underneath it.
 
-## Security
+## Security mesures
 
 - URLs are checked against an explicit host allowlist (TikTok/YouTube/Dailymotion/
   SoundCloud/Instagram/X/Threads domains only) before any network request is made.
