@@ -153,7 +153,7 @@ Whatever subtitle format the source actually provides gets converted to `.srt`, 
 the output is consistent regardless of platform. If a video simply has no captions
 available, Grabinator says so and moves on rather than failing the whole run.
 
-### Quality control
+### Quality selection
 
 ```bash
 # Interactively pick a resolution from a numbered menu
