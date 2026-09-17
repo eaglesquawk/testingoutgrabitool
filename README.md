@@ -1,12 +1,12 @@
 # Grabinator
 
-[![Tests](https://github.com/<you>/grabinator/actions/workflows/test.yml/badge.svg)](https://github.com/<you>/grabinator/actions/workflows/test.yml)
+[![Tests](https://github.com/eaglesquawk/grabinator/actions/workflows/test.yml/badge.svg)](https://github.com/eaglesquawk/grabinator/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Platforms](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 
 A command-line downloader for **TikTok, YouTube, Dailymotion, SoundCloud, Instagram,
-X, and Threads** — security-hardened, automatic
+X, and Threads** — security-hardened, with real progress bars, automatic
 quality-aware deduplication, and playback fixes for native macOS players. Also
 converts local video files to MP3 with `--convert`, no network access required.
 
@@ -16,6 +16,7 @@ converts local video files to MP3 with `--convert`, no network access required.
 - [Supported platforms (OS)](#supported-platforms-os)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Authentication (cookies)](#authentication-cookies)
 - [Configuration](#configuration)
 - [Security](#security)
 - [Legal](#legal)
@@ -32,11 +33,14 @@ converts local video files to MP3 with `--convert`, no network access required.
 | **Organization** | Each platform gets its own subfolder (`TikTok/`, `YouTube/`, etc.) |
 | **Audio** | `--mp3` extracts clean, padding-free audio on any platform |
 | **Local conversion** | `--convert PATH` turns existing video files into MP3s — no downloading |
+| **Captions** | `--captions` downloads subtitles only (converted to `.srt`), for a video or a whole playlist |
+| **Channels** | Point a YouTube channel/handle URL at Grabinator and it downloads every upload, same as a playlist |
 | **Playlists** | Full YouTube/SoundCloud playlist support, with `--range` to grab a specific span |
 | **Quality** | Capped one tier above 1080p by default, or pick interactively with `-q` |
 | **Dedupe** | Re-downloading never creates duplicates — a lower/equal-quality repeat is skipped, a genuinely better one replaces the old file |
 | **macOS fix** | Auto re-encodes tracks that play in VLC but are silent/blank in QuickTime, Preview, or Photos |
-| **Privacy** | `--proxy` routes every request (including the connectivity check) through a SOCKS5/HTTP(S) proxy |
+| **Proxy** | `--proxy` routes every request (including the connectivity check) through a SOCKS5/HTTP(S) proxy |
+| **Cookies** | `--cookies-from-browser` or `--cookies` unlock private/login-required content |
 | **Size check** | `-c` shows the estimated download size — one total for a whole playlist — before anything downloads |
 
 ## Supported platforms (OS)
@@ -57,7 +61,7 @@ The one external dependency that varies by OS is `ffmpeg` itself — see
 ## Installation
 
 ```bash
-git clone https://github.com/<you>/grabinator.git
+git clone https://github.com/eaglesquawk/grabinator.git
 cd grabinator
 pip install -e .
 ```
@@ -85,17 +89,22 @@ grabinator "https://x.com/user/status/XXXXXXXXXXX"
 grabinator "https://www.threads.net/@user/post/XXXXXXXXXXX"
 ```
 
-### Playlists
+### Playlists and channels
 
 ```bash
 grabinator "https://www.youtube.com/playlist?list=XXXXXXXXXXX"
 grabinator "https://soundcloud.com/artist/sets/album-name"
 
-# Only videos 3 through 7 of a playlist
-grabinator "PLAYLIST_URL" --range 3-7
+# A YouTube channel or handle downloads every upload, the same as a playlist —
+# no special flag needed, Grabinator recognizes the URL shape automatically
+grabinator "https://www.youtube.com/@SomeChannel"
+grabinator "https://www.youtube.com/channel/UCxxxxxxxxxxxxxxxxxxxxxx"
+
+# Only videos 3 through 7 of a playlist or channel
+grabinator "PLAYLIST_OR_CHANNEL_URL" --range 3-7
 
 # Just the first 10
-grabinator "PLAYLIST_URL" --range 10
+grabinator "PLAYLIST_OR_CHANNEL_URL" --range 10
 ```
 
 ### Multiple URLs at once
@@ -109,7 +118,16 @@ grabinator "URL1,URL2,URL3"
 ```bash
 # Audio only, on any platform — clean MP3, no leading silence
 grabinator "URL" --mp3
+```
 
+The leading-silence "padding" that naive MP3 extraction leaves in place comes from
+source timestamps that don't start at zero — this isn't a TikTok-specific quirk, it
+affects YouTube (and Dailymotion, SoundCloud, the rest) just as much. `--mp3` runs
+the exact same ffmpeg fix — zeroing negative timestamps and regenerating clean
+presentation timestamps before encoding — on every platform uniformly, YouTube
+included, so the output is padding-free no matter where it came from.
+
+```bash
 # Convert local video files to MP3 instead — no network access at all,
 # originals are never touched. PATH can be a file, a folder, or a .txt
 # manifest listing one path per line.
@@ -117,6 +135,23 @@ grabinator --convert /path/to/videos
 grabinator --convert /path/to/video.mp4
 grabinator --convert /path/to/list.txt
 ```
+
+### Captions
+
+```bash
+# Download only the subtitles for a video, saved as .srt
+grabinator "URL" --captions
+
+# Works on a whole playlist or channel too — one .srt per video
+grabinator "PLAYLIST_OR_CHANNEL_URL" --captions
+
+# A specific language (default: en)
+grabinator "URL" --captions --caption-lang es
+```
+
+Whatever subtitle format the source actually provides gets converted to `.srt`, so
+the output is consistent regardless of platform. If a video simply has no captions
+available, Grabinator says so and moves on rather than failing the whole run.
 
 ### Quality control
 
@@ -129,7 +164,7 @@ grabinator "URL" -q
 grabinator "URL" -c
 ```
 
-### Networking
+### Proxy
 
 ```bash
 grabinator "URL" --proxy socks5://127.0.0.1:9050
@@ -141,14 +176,42 @@ grabinator "URL" --proxy http://user:pass@host:port
 ```bash
 grabinator "URL" --silent                  # suppress progress bars and status output
 grabinator "URL" --output-dir /some/path   # override the default download folder
+grabinator "URL" --log                     # also write this run's output to a timestamped .txt file
 grabinator --version                       # print the installed version
 ```
+
+`--log` writes a full copy of everything printed during that run to
+`<output-dir>/logs/grabinator_<timestamp>.txt`, one file per run, alongside — not
+instead of — the normal console output. Live-updating progress-bar frames aren't
+logged individually (that would just be noise); each bar's final result still is.
 
 Run without installing, straight from the source file:
 
 ```bash
 python src/grabinator/cli.py "URL"
 ```
+
+## Authentication (cookies)
+
+Some content requires being logged in to view at all — a private Instagram account,
+an age-restricted YouTube video, some Threads posts. Grabinator doesn't handle logins
+itself; instead it borrows a session you already have, the same way `yt-dlp` does
+under the hood.
+
+```bash
+# Reuse cookies from a browser you're already logged into
+grabinator "PRIVATE_URL" --cookies-from-browser chrome
+grabinator "PRIVATE_URL" --cookies-from-browser firefox
+
+# Or use an exported cookies.txt file instead, without touching a live browser profile
+grabinator "PRIVATE_URL" --cookies /path/to/cookies.txt
+```
+
+The two are mutually exclusive — pick one. `--cookies-from-browser` reads directly
+from that browser's cookie storage each run; `--cookies` points at a Netscape-format
+file you've exported once (browser extensions like "Get cookies.txt" can produce
+this). Neither option is stored, logged, or written anywhere by Grabinator itself —
+they're passed straight through to `yt-dlp` for that run only.
 
 ## Configuration
 
@@ -175,6 +238,9 @@ Whatever you choose, each platform still gets its own subfolder underneath it.
   fixed external address unrelated to what you asked to download.
 - `--convert` never opens the network at all, and never modifies or deletes the
   original video files it reads.
+- Cookies passed via `--cookies-from-browser` or `--cookies` are used only for that
+  run's requests — Grabinator never writes them to disk, logs them, or includes them
+  in the dedupe index.
 
 ## Legal
 
@@ -187,16 +253,18 @@ copyright law. You're responsible for how you use it.
 
 ```bash
 pip install -e ".[dev]"
+pre-commit install
 pytest
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new platform, what's expected
+Linting/formatting runs automatically on commit via `pre-commit` + `ruff`. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new platform, what's expected
 of a pull request, and the release process. See [CHANGELOG.md](CHANGELOG.md) for the
 project's history.
 
 ## Author
 
-EagleSquwak
+EagleSquwak — September 2026
 
 ## License
 
