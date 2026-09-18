@@ -17,11 +17,11 @@ Every contribution helps fund the time spent building, maintaining, documenting,
 
 <p align="center">
 
-<a href="YOUR_KOFI_LINK">
+<a href="https://ko-fi.com/eaglesquawk">
   <img src="https://img.shields.io/badge/Ko--fi-Support%20me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support on Ko-fi">
 </a>
 
-<a href="YOUR_CREATORS_SA_LINK">
+<a href="https://creators.sa/eaglesquawk">
   <img src="https://img.shields.io/badge/Creators.sa-Support%20me-111827?style=for-the-badge&logoColor=white" alt="Support on Creators.sa">
 </a>
 
@@ -32,7 +32,7 @@ Every contribution helps fund the time spent building, maintaining, documenting,
 For direct support, you can send Bitcoin to:
 
 ```text
-YOUR_BITCOIN_ADDRESS
+bc1qgveengfgz9qnvu49d4axpefael86mr3jmxgymd
 ```
 
 **Network:** Bitcoin (BTC)
