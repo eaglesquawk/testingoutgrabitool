@@ -1,6 +1,5 @@
 # Grabinator
 
-[![Tests](https://github.com/eaglesquawk/grabinator/actions/workflows/test.yml/badge.svg)](https://github.com/eaglesquawk/grabinator/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Platforms](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
@@ -18,7 +17,8 @@ converts local video files to MP3 with `--convert`, no network access required.
 - [Usage](#usage)
 - [Authentication (cookies)](#authentication-cookies)
 - [Configuration](#configuration)
-- [Security](#security)
+- [Security measures](#security-measures)
+- [Testing status](#testing-status)
 - [Legal](#legal)
 - [Development](#development)
 - [Author](#author)
@@ -36,7 +36,7 @@ converts local video files to MP3 with `--convert`, no network access required.
 | **Captions** | `--captions` downloads subtitles only (converted to `.srt`), for a video or a whole playlist |
 | **Channels** | Point a YouTube channel/handle URL at Grabinator and it downloads every upload, same as a playlist |
 | **Playlists** | Full YouTube/SoundCloud playlist support, with `--range` to grab a specific span |
-| **Quality** | Capped one tier above 1080p by default, or pick interactively with `-q` |
+| **Quality selection** | Capped one tier above 1080p by default, or pick interactively with `-q` |
 | **Dedupe** | Re-downloading never creates duplicates — a lower/equal-quality repeat is skipped, a genuinely better one replaces the old file |
 | **macOS fix** | Auto re-encodes tracks that play in VLC but are silent/blank in QuickTime, Preview, or Photos |
 | **Proxy** | `--proxy` routes every request (including the connectivity check) through a SOCKS5/HTTP(S) proxy |
@@ -153,7 +153,7 @@ Whatever subtitle format the source actually provides gets converted to `.srt`, 
 the output is consistent regardless of platform. If a video simply has no captions
 available, Grabinator says so and moves on rather than failing the whole run.
 
-### Quality selection (yeah for real)
+### Quality control
 
 ```bash
 # Interactively pick a resolution from a numbered menu
@@ -218,13 +218,13 @@ they're passed straight through to `yt-dlp` for that run only.
 The default download folder is set at the top of `src/grabinator/cli.py`:
 
 ```python
-OUTPUT_DIR = Path.home() / "Downloads" / "Grabinator"
+OUTPUT_DIR = Path.home() / "Downloads" / "media by Grabinator"
 ```
 
 Edit that constant, or pass `--output-dir` on the command line to override it per run.
 Whatever you choose, each platform still gets its own subfolder underneath it.
 
-## Security mesures
+## Security measures
 
 - URLs are checked against an explicit host allowlist (TikTok/YouTube/Dailymotion/
   SoundCloud/Instagram/X/Threads domains only) before any network request is made.
@@ -241,6 +241,26 @@ Whatever you choose, each platform still gets its own subfolder underneath it.
 - Cookies passed via `--cookies-from-browser` or `--cookies` are used only for that
   run's requests — Grabinator never writes them to disk, logs them, or includes them
   in the dedupe index.
+
+## Testing status
+
+The pure logic (URL/platform detection, path safety, filename sanitization, range
+parsing, cookie-options handling, etc.) is covered by an automated test suite and
+verified on every push. A few things are logic-verified but **not yet confirmed
+against real, live usage**:
+
+- **Windows.** The UTF-8/ANSI console hardening is implemented and tested for
+  correctness, but hasn't been run on an actual Windows machine.
+- **Cookies** (`--cookies-from-browser`, `--cookies`). The options are built and
+  passed to `yt-dlp` correctly, but haven't been exercised against a real
+  login-gated download.
+- **Channel downloads.** URL detection and normalization to a channel's "Videos"
+  tab are tested, but a real channel hasn't been downloaded end-to-end yet.
+- **Captions.** The download and `.srt` conversion path hasn't been run against a
+  real video with real subtitles.
+
+If you hit something that doesn't work as documented in one of these areas, that's
+useful to know about.
 
 ## Legal
 
