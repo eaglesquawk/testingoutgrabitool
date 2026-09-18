@@ -5,9 +5,9 @@
 ![Platforms](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 
 A command-line downloader for **TikTok, YouTube, Dailymotion, SoundCloud, Instagram,
-X, and Threads** — security-hardened, with real progress bars, automatic
-quality-aware deduplication, and playback fixes for native macOS players. Also
-converts local video files to MP3 with `--convert`, no network access required.
+X, and Threads** — security-hardened, with automatic quality-aware deduplication and
+playback fixes for native macOS players. Also converts local video files to MP3 with
+`--convert`, no network access required.
 
 ## Table of contents
 
@@ -153,7 +153,7 @@ Whatever subtitle format the source actually provides gets converted to `.srt`, 
 the output is consistent regardless of platform. If a video simply has no captions
 available, Grabinator says so and moves on rather than failing the whole run.
 
-### Quality control
+### Quality selection
 
 ```bash
 # Interactively pick a resolution from a numbered menu
